@@ -5,22 +5,52 @@
   <title>📬 Bức Thư Bí Ẩn</title>
   <style>
     body {
+      margin: 0;
+      padding: 0;
       font-family: 'Courier New', monospace;
-      background: radial-gradient(circle, #ffe, #ccf);
-      padding: 50px;
-      text-align: center;
+      background: url('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.reddit.com%2Fr%2Fwallpaper%2Fcomments%2F77ta5e%2Famazing_winter_wallpaper_19201200%2F%3Ftl%3Dvi&psig=AOvVaw23IxlnaCDLbgICmmSTt1Yd&ust=1748522193657000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOixkvSWxo0DFQAAAAAdAAAAABAE') no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
     }
+
     .letter {
+      position: relative;
+      z-index: 10;
+      margin: 100px auto;
+      width: fit-content;
       border: 2px dashed #333;
       padding: 30px;
       border-radius: 15px;
-      background-color: white;
-      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.9);
       box-shadow: 4px 4px 15px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .snowflake {
+      position: fixed;
+      top: -10px;
+      color: white;
+      font-size: 1.2em;
+      user-select: none;
+      pointer-events: none;
+      z-index: 5;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
+
   <div class="letter">
     <h2>✨ Bạn có một bức thư ✨</h2>
     <p>Thân gửi bạn,</p>
@@ -28,5 +58,23 @@
     <p>Chúc bạn niềm vui, sự bình an, và những bất ngờ đáng yêu!</p>
     <p>— Gửi từ Python với yêu thương 💌</p>
   </div>
+
+  <script>
+    function createSnowflake() {
+      const snowflake = document.createElement('div');
+      snowflake.classList.add('snowflake');
+      snowflake.textContent = '❄';
+      snowflake.style.left = Math.random() * 100 + 'vw';
+      snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+      snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+      document.body.appendChild(snowflake);
+      setTimeout(() => {
+        snowflake.remove();
+      }, 5000);
+    }
+
+    setInterval(createSnowflake, 200);
+  </script>
+
 </body>
 </html>
