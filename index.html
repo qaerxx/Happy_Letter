@@ -4,37 +4,64 @@
   <meta charset="UTF-8">
   <title>📬 Bức Thư Bí Ẩn</title>
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
+      height: 100%;
       font-family: 'Courier New', monospace;
-      background: url('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.reddit.com%2Fr%2Fwallpaper%2Fcomments%2F77ta5e%2Famazing_winter_wallpaper_19201200%2F%3Ftl%3Dvi&psig=AOvVaw23IxlnaCDLbgICmmSTt1Yd&ust=1748522193657000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOixkvSWxo0DFQAAAAAdAAAAABAE') no-repeat center center fixed;
-      background-size: cover;
       overflow: hidden;
+    }
+
+    body {
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
     }
 
     .letter {
       position: relative;
-      z-index: 10;
-      margin: 100px auto;
-      width: fit-content;
+      z-index: 3;
+      background-color: rgba(255, 255, 255, 0.95);
       border: 2px dashed #333;
       padding: 30px;
       border-radius: 15px;
-      background-color: rgba(255, 255, 255, 0.9);
       box-shadow: 4px 4px 15px rgba(0,0,0,0.2);
       text-align: center;
+      max-width: 600px;
+      margin: 50px auto;
     }
 
+    .full-img {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 90vw;
+      height: 90vh;
+      object-fit: cover;
+      transform: translate(-50%, -50%) scale(1.1) rotate(1deg);
+      opacity: 0;
+      transition: opacity 1.2s ease, transform 1.5s ease;
+      z-index: 1;
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.4);
+    }
+
+    .full-img.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+
+    /* Tuyết rơi */
     .snowflake {
       position: fixed;
       top: -10px;
       color: white;
-      font-size: 1.2em;
+      font-size: 24px;
       user-select: none;
       pointer-events: none;
-      z-index: 5;
+      z-index: 2;
       animation: fall linear infinite;
+      text-shadow: 0 0 4px white, 0 0 8px white;
     }
 
     @keyframes fall {
@@ -52,28 +79,65 @@
 <body>
 
   <div class="letter">
-    <h2>✨ Bạn có một bức thư ✨</h2>
+    <h2>✨ <b>Bạn có một bức thư</b> ✨</h2>
     <p>Thân gửi bạn,</p>
     <p>Hôm nay là một ngày tuyệt vời để mỉm cười.</p>
     <p>Chúc bạn niềm vui, sự bình an, và những bất ngờ đáng yêu!</p>
     <p>— Gửi từ Python với yêu thương 💌</p>
   </div>
 
+  <!-- Hiệu ứng tuyết -->
   <script>
-    function createSnowflake() {
-      const snowflake = document.createElement('div');
-      snowflake.classList.add('snowflake');
-      snowflake.textContent = '❄';
-      snowflake.style.left = Math.random() * 100 + 'vw';
-      snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
-      snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
-      document.body.appendChild(snowflake);
-      setTimeout(() => {
-        snowflake.remove();
-      }, 5000);
+    const snowChars = ['❄','❅','❆'];
+    for (let i = 0; i < 50; i++) {
+      const snow = document.createElement('div');
+      snow.className = 'snowflake';
+      snow.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
+      snow.style.left = Math.random() * 100 + 'vw';
+      snow.style.animationDuration = (5 + Math.random() * 5) + 's';
+      snow.style.animationDelay = (Math.random() * 5) + 's';
+      snow.style.fontSize = (20 + Math.random() * 15) + 'px';
+      document.body.appendChild(snow);
+    }
+  </script>
+
+  <!-- Hiển thị ảnh lần lượt và lặp lại -->
+  <script>
+    const images = [
+      'img1.png', 'img2.png', 'img3.png',
+      'img4.png', 'img5.png', 'img6.png',
+      'img7.png', 'img8.png', 'img9.png'
+    ];
+
+    let currentIndex = 0;
+    let currentImg = null;
+
+    function showNextImage() {
+      // Xóa ảnh cũ nếu có
+      if (currentImg) {
+        currentImg.remove();
+      }
+
+      // Tạo ảnh mới
+      const img = document.createElement('img');
+      img.src = images[currentIndex];
+      img.className = 'full-img';
+      document.body.appendChild(img);
+      currentImg = img;
+
+      // Hiệu ứng hiện ảnh
+      requestAnimationFrame(() => {
+        img.classList.add('visible');
+      });
+
+      // Cập nhật index cho ảnh tiếp theo
+      currentIndex = (currentIndex + 1) % images.length;
+
+      // Gọi lại sau 1 giây
+      setTimeout(showNextImage, 3000);
     }
 
-    setInterval(createSnowflake, 200);
+    showNextImage();
   </script>
 
 </body>
