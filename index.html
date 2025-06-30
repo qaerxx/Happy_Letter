@@ -10,6 +10,8 @@
       height: 100%;
       font-family: 'Courier New', monospace;
       overflow: hidden;
+      /* Thêm con trỏ để gợi ý có thể click */
+      cursor: pointer; 
     }
 
     body {
@@ -29,6 +31,13 @@
       text-align: center;
       max-width: 600px;
       margin: 50px auto;
+      /* Thêm transition để chữ thay đổi mượt hơn */
+      transition: opacity 0.5s ease;
+    }
+
+    /* Thêm class để làm mờ chữ khi chuyển đổi */
+    .letter.fading {
+      opacity: 0;
     }
 
     .full-img {
@@ -51,7 +60,7 @@
       transform: translate(-50%, -50%) scale(1) rotate(0deg);
     }
 
-    /* Tuyết rơi */
+    /* Tuyết rơi (giữ nguyên) */
     .snowflake {
       position: fixed;
       top: -10px;
@@ -78,15 +87,15 @@
 </head>
 <body>
 
-  <div class="letter">
-    <h2>✨ <b>Bạn có một bức thư</b> ✨</h2>
-    <p>Thân gửi bạn,</p>
-    <p>Hôm nay là một ngày tuyệt vời để mỉm cười.</p>
-    <p>Chúc bạn niềm vui, sự bình an, và những bất ngờ đáng yêu!</p>
-    <p>— Gửi từ Python với yêu thương 💌</p>
+  <!-- Thay đổi cấu trúc thư để dễ dàng cập nhật bằng JS -->
+  <div class="letter" id="letter-box">
+    <h2 id="letter-title"></h2>
+    <p id="letter-recipient"></p>
+    <p id="letter-body"></p>
+    <p id="letter-signature"></p>
   </div>
 
-  <!-- Hiệu ứng tuyết -->
+  <!-- Hiệu ứng tuyết (giữ nguyên) -->
   <script>
     const snowChars = ['❄','❅','❆'];
     for (let i = 0; i < 50; i++) {
@@ -101,43 +110,113 @@
     }
   </script>
 
-  <!-- Hiển thị ảnh lần lượt và lặp lại -->
+  <!-- Script hiển thị ảnh và tin nhắn đã được sửa -->
   <script>
-    const images = [
-      'img1.png', 'img2.png', 'img3.png',
-      'img4.png', 'img5.png', 'img6.png',
-      'img7.png', 'img8.png', 'img9.png'
+    // --- PHẦN 1: CẤU TRÚC DỮ LIỆU ---
+    // Mỗi object chứa ảnh và các phần của tin nhắn tương ứng
+    const slides = [
+      {
+        image: 'img1.png',
+        title: '✨ <b>Time for a happy smile!</b> ✨',
+        recipient: 'Warmest greetings,',
+        body: 'A little treat is waiting for you. Click here!',
+        signature: '— Ruby 💌'
+      },
+      {
+        image: 'img2.png',
+        title: '☃ <b>Snowmen in snow village</b> ☃',
+        recipient: 'To a friend I treasure,',
+        body: 'What a trip to remember, my first time seeing snow and it was amazing.',
+        signature: '— Someone who adores the snow'
+      },
+      {
+        image: 'img3.png',
+        title: '☕ <b>Time to unwind</b> ☕',
+        recipient: 'Hey, busy bee!',
+        body: 'Step away from the hustle and bustle. A cozy cup of tea and some well-deserved peace await.',
+        signature: '— Quite a calming perspective, right?'
+      },
+      {
+        image: 'img4.png',
+        title: '🎈 <b>A small delight</b> 🎈',
+        recipient: 'To the one who sometimes carries unspoken burdens',
+        body: 'Sometimes, happiness is found in the simple pleasures of doing what you like.',
+        signature: '— Promise me you will appreciate the world more, will you?'
+      },
+      {
+        image: 'img7.png',
+        title: '🗺️ <b>Friendly Appreciation</b> 🗺️',
+        recipient: 'To this awesome dude,',
+        body: 'Not for any reason, just wanted to say you are a genuinely great friend. Glad we met.',
+        signature: '— Your forever teammate.'
+      },
+      {
+        image: 'img8.png',
+        title: '🍀 <b>Wishing you joy and a full belly every day</b> 🍀',
+        recipient: 'May you buy every pair of shoes you like, go everywhere your heart desires, and drive the car you truly love.',
+        body: 'May peace always find you, and may you always stay healthy and strong.',
+        signature: '- Happy Birthday!!!'
+      }
     ];
 
+    // --- PHẦN 2: LOGIC HIỂN THỊ ---
+    
+    // Lấy các element cần cập nhật
+    const letterBox = document.getElementById('letter-box');
+    const letterTitle = document.getElementById('letter-title');
+    const letterRecipient = document.getElementById('letter-recipient');
+    const letterBody = document.getElementById('letter-body');
+    const letterSignature = document.getElementById('letter-signature');
+
     let currentIndex = 0;
-    let currentImg = null;
+    let currentImgElement = null;
 
-    function showNextImage() {
+    function showSlide(index) {
+      const slide = slides[index];
+
+      // 1. Cập nhật ảnh nền
       // Xóa ảnh cũ nếu có
-      if (currentImg) {
-        currentImg.remove();
+      if (currentImgElement) {
+        currentImgElement.remove();
       }
-
       // Tạo ảnh mới
-      const img = document.createElement('img');
-      img.src = images[currentIndex];
-      img.className = 'full-img';
-      document.body.appendChild(img);
-      currentImg = img;
-
-      // Hiệu ứng hiện ảnh
+      const newImg = document.createElement('img');
+      newImg.src = slide.image;
+      newImg.className = 'full-img';
+      document.body.insertBefore(newImg, document.body.firstChild); // Chèn vào đầu để ở lớp dưới
+      currentImgElement = newImg;
+      // Kích hoạt hiệu ứng hiện ảnh
       requestAnimationFrame(() => {
-        img.classList.add('visible');
+        newImg.classList.add('visible');
       });
 
-      // Cập nhật index cho ảnh tiếp theo
-      currentIndex = (currentIndex + 1) % images.length;
-
-      // Gọi lại sau 1 giây
-      setTimeout(showNextImage, 3000);
+      // 2. Cập nhật nội dung thư với hiệu ứng mờ dần
+      letterBox.classList.add('fading');
+      setTimeout(() => {
+        letterTitle.innerHTML = slide.title;
+        letterRecipient.innerHTML = slide.recipient;
+        letterBody.innerHTML = slide.body;
+        letterSignature.innerHTML = slide.signature;
+        letterBox.classList.remove('fading');
+      }, 500); // Đợi 0.5s (bằng với transition) rồi mới hiện nội dung mới
     }
 
-    showNextImage();
+    function showNextSlide() {
+      // Tăng chỉ số, và quay lại 0 nếu hết mảng
+      currentIndex = (currentIndex + 1) % slides.length;
+      showSlide(currentIndex);
+    }
+
+    // --- PHẦN 3: KHỞI TẠO VÀ LẮNG NGHE SỰ KIỆN ---
+    
+    // Hiển thị slide đầu tiên khi tải trang
+    document.addEventListener('DOMContentLoaded', () => {
+      showSlide(0);
+    });
+
+    // Lắng nghe sự kiện click trên toàn bộ trang
+    document.body.addEventListener('click', showNextSlide);
+
   </script>
 
 </body>
