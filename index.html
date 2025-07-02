@@ -10,13 +10,14 @@
       height: 100%;
       font-family: 'Courier New', monospace;
       overflow: hidden;
-      /* Thêm con trỏ để gợi ý có thể click */
-      cursor: pointer; 
+      cursor: pointer;
     }
 
     body {
-      background: url('background.jpg') no-repeat center center fixed;
+      background: #000;
       background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
       position: relative;
     }
 
@@ -32,37 +33,38 @@
       max-width: 600px;
       margin: 50px auto;
       color: #fff;
-      text-shadow:5px 5px 10px rgba(0, 0, 0, 1);
-      /* Thêm transition để chữ thay đổi mượt hơn */
+      text-shadow: 5px 5px 10px rgba(0, 0, 0, 1);
       transition: opacity 0.5s ease;
+      pointer-events: none;
+      user-select: none;
     }
 
-    /* Thêm class để làm mờ chữ khi chuyển đổi */
     .letter.fading {
       opacity: 0;
     }
 
-    .full-img {
+    .media-background {
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 90vw;
-      height: 90vh;
+      width: 100vw;
+      height: 100vh;
       object-fit: cover;
-      transform: translate(-50%, -50%) scale(1.1) rotate(1deg);
+      transform: translate(-50%, -50%) scale(1.1);
       opacity: 0;
       transition: opacity 1.2s ease, transform 1.5s ease;
       z-index: 1;
-      border-radius: 20px;
-      box-shadow: 0 0 40px rgba(0,0,0,0.4);
     }
 
-    .full-img.visible {
+    .media-background.visible {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      transform: translate(-50%, -50%) scale(1);
     }
+    
+    /* --- ĐÃ XÓA ---
+       Phần CSS cho #audio-control không còn cần thiết.
+    */
 
-    /* Tuyết rơi (giữ nguyên) */
     .snowflake {
       position: fixed;
       top: -10px;
@@ -89,7 +91,15 @@
 </head>
 <body>
 
-  <!-- Thay đổi cấu trúc thư để dễ dàng cập nhật bằng JS -->
+  <audio id="background-music" loop>
+    <source src="background_music.mp3" type="audio/mpeg">
+  </audio>
+  
+  <!-- --- ĐÃ XÓA ---
+     Thẻ div cho nút điều khiển âm thanh đã được loại bỏ.
+  -->
+
+
   <div class="letter" id="letter-box">
     <h2 id="letter-title"></h2>
     <p id="letter-recipient"></p>
@@ -97,7 +107,6 @@
     <p id="letter-signature"></p>
   </div>
 
-  <!-- Hiệu ứng tuyết (giữ nguyên) -->
   <script>
     const snowChars = ['❄','❅','❆'];
     for (let i = 0; i < 50; i++) {
@@ -112,112 +121,163 @@
     }
   </script>
 
-  <!-- Script hiển thị ảnh và tin nhắn đã được sửa -->
   <script>
-    // --- PHẦN 1: CẤU TRÚC DỮ LIỆU ---
-    // Mỗi object chứa ảnh và các phần của tin nhắn tương ứng
     const slides = [
       {
-        image: 'img1.png',
-        title: '✨ <b>Time for a happy smile!</b> ✨',
-        recipient: 'Warmest greetings,',
-        body: 'A little treat is waiting for you. Click here!',
+        type: 'image',
+        source: 'img1.png',
+        title: '✨ <b>How are you today, anh ơi?</b> ✨',
+        recipient: 'Got a little time for a tiny treat?',
+        body: 'Click on the right side nha!',
         signature: '— Ruby 💌'
       },
       {
-        image: 'img2.png',
+        type: 'image',
+        source: 'img2.png',
         title: '☃ <b>Snowmen in snow village</b> ☃',
         recipient: 'To a friend I treasure,',
         body: 'What a trip to remember, my first time seeing snow and it was amazing.',
-        signature: '— Someone who adores the snow'
+        signature: '— Someone who adores the snow almost as much as adores you. I intentionally put my snowman on that position so that you could see it when you woke up. And you saw them all hehe!!!"'
+      },
+      // {
+      //   type: 'image',
+      //   source: 'img5.png',
+      //   title: '☕ <b>Time to unwind</b> ☕',
+      //   recipient: 'Hey, busy bee!',
+      //   body: 'Step away from the hustle and bustle. A cozy cup of tea and some well-deserved peace await.',
+      //   signature: '— Quite a calming perspective, right?'
+      // },
+      {
+        type: 'image',
+        source: 'img7.png',
+        title: '🗺️ <b>I’m glad you came,</b> 🗺️',
+        recipient: 'My little universe hasn’t been the same since,',
+        body: 'Just like how you opened up the world to me — now, you won’t be so alone.',
+        signature: '— I’m grateful that we met.'
       },
       {
-        image: 'img7.png',
-        title: '☕ <b>Time to unwind</b> ☕',
-        recipient: 'Hey, busy bee!',
-        body: 'Step away from the hustle and bustle. A cozy cup of tea and some well-deserved peace await.',
-        signature: '— Quite a calming perspective, right?'
-      },
-      {
-        image: 'img4.png',
-        title: '🎈 <b>A small delight</b> 🎈',
-        recipient: 'To the one who sometimes carries unspoken burdens',
-        body: 'Sometimes, happiness is found in the simple pleasures of doing what you like.',
-        signature: '— Promise me you will appreciate the world more, will you?'
-      },
-      {
-        image: 'img7.png',
-        title: '🗺️ <b>Friendly Appreciation</b> 🗺️',
-        recipient: 'To this awesome dude,',
-        body: 'Not for any reason, just wanted to say you are a genuinely great friend. Glad we met.',
-        signature: '— Your forever teammate.'
-      },
-      {
-        image: 'img8.png',
+        type: 'image',
+        source: 'img8.png',
         title: '🍀 <b>Wishing you joy and a full belly every day</b> 🍀',
         recipient: 'May you buy every pair of shoes you like, go everywhere your heart desires, and drive the car you truly love.',
         body: 'May peace always find you, and may you always stay healthy and strong.',
         signature: '- Happy Birthday!!!'
+      },
+      {
+        type: 'video',
+        source: 'my_video.mp4',
+        title: '',
+        recipient: '',
+        body: '',
+        signature: '🎬 Happy birthday! I put together a little video for you, I hope you like it. 🎬'
       }
     ];
 
-    // --- PHẦN 2: LOGIC HIỂN THỊ ---
-    
-    // Lấy các element cần cập nhật
     const letterBox = document.getElementById('letter-box');
     const letterTitle = document.getElementById('letter-title');
     const letterRecipient = document.getElementById('letter-recipient');
     const letterBody = document.getElementById('letter-body');
     const letterSignature = document.getElementById('letter-signature');
+    const music = document.getElementById('background-music');
+    // --- ĐÃ XÓA --- Biến audioControl không còn cần thiết
+    let isMusicPlaying = false;
+    music.muted = true;
 
     let currentIndex = 0;
-    let currentImgElement = null;
+    let currentMediaElement = null;
 
     function showSlide(index) {
-      const slide = slides[index];
+        const slide = slides[index];
 
-      // 1. Cập nhật ảnh nền
-      // Xóa ảnh cũ nếu có
-      if (currentImgElement) {
-        currentImgElement.remove();
-      }
-      // Tạo ảnh mới
-      const newImg = document.createElement('img');
-      newImg.src = slide.image;
-      newImg.className = 'full-img';
-      document.body.insertBefore(newImg, document.body.firstChild); // Chèn vào đầu để ở lớp dưới
-      currentImgElement = newImg;
-      // Kích hoạt hiệu ứng hiện ảnh
-      requestAnimationFrame(() => {
-        newImg.classList.add('visible');
-      });
+        if (currentMediaElement) {
+            currentMediaElement.remove();
+        }
 
-      // 2. Cập nhật nội dung thư với hiệu ứng mờ dần
-      letterBox.classList.add('fading');
-      setTimeout(() => {
-        letterTitle.innerHTML = slide.title;
-        letterRecipient.innerHTML = slide.recipient;
-        letterBody.innerHTML = slide.body;
-        letterSignature.innerHTML = slide.signature;
-        letterBox.classList.remove('fading');
-      }, 500); // Đợi 0.5s (bằng với transition) rồi mới hiện nội dung mới
+        if (slide.type === 'image') {
+            const newImg = document.createElement('img');
+            newImg.src = slide.source;
+            newImg.className = 'media-background';
+            document.body.insertBefore(newImg, document.body.firstChild);
+            currentMediaElement = newImg;
+
+            // --- THAY ĐỔI ---
+            // Nếu nhạc đã được khởi chạy, BẬT nhạc nền
+            if (isMusicPlaying) {
+                music.muted = false;
+            }
+
+        } else if (slide.type === 'video') {
+            const newVideo = document.createElement('video');
+            newVideo.src = slide.source;
+            newVideo.className = 'media-background';
+            newVideo.autoplay = true;
+            newVideo.loop = true;
+            newVideo.playsInline = true;
+            newVideo.muted = false;
+            document.body.insertBefore(newVideo, document.body.firstChild);
+            currentMediaElement = newVideo;
+
+            // --- THAY ĐỔI ---
+            // Luôn TẮT nhạc nền khi có video
+            music.muted = true;
+        }
+
+        requestAnimationFrame(() => {
+            if(currentMediaElement) currentMediaElement.classList.add('visible');
+        });
+
+        if (slide.type === 'video' || slide.showLetter === false) {
+            // Nếu đúng, chỉ cần ẩn hộp thư đi
+            letterBox.classList.add('fading');
+        } else {
+            // Ngược lại, hiển thị hộp thư như bình thường
+            letterBox.classList.add('fading');
+            setTimeout(() => {
+                letterTitle.innerHTML = slide.title || '';
+                letterRecipient.innerHTML = slide.recipient || '';
+                letterBody.innerHTML = slide.body || '';
+                letterSignature.innerHTML = slide.signature || '';
+                letterBox.classList.remove('fading');
+            }, 500);
+        }
     }
 
-    function showNextSlide() {
-      // Tăng chỉ số, và quay lại 0 nếu hết mảng
+    function goNext() {
       currentIndex = (currentIndex + 1) % slides.length;
       showSlide(currentIndex);
     }
 
-    // --- PHẦN 3: KHỞI TẠO VÀ LẮNG NGHE SỰ KIỆN ---
-    
-    // Hiển thị slide đầu tiên khi tải trang
+    function goBack() {
+      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+      showSlide(currentIndex);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       showSlide(0);
     });
 
-    // Lắng nghe sự kiện click trên toàn bộ trang
-    document.body.addEventListener('click', showNextSlide);
+    document.body.addEventListener('click', function(event) {
+      // --- THAY ĐỔI ---
+      // Logic này chỉ chạy một lần duy nhất khi người dùng click lần đầu
+      if (!isMusicPlaying) {
+        music.play().catch(error => console.log("Lỗi tự động phát âm thanh:", error));
+        isMusicPlaying = true;
+        // Bật nhạc ngay lập tức vì slide đầu tiên là ảnh
+        music.muted = false;
+      }
+
+      const screenWidth = window.innerWidth;
+      const clickX = event.clientX;
+
+      if (clickX > screenWidth / 2) {
+        goNext();
+      } else {
+        goBack();
+      }
+    });
+
+    // --- ĐÃ XÓA ---
+    // Toàn bộ sự kiện click cho audioControl đã được loại bỏ.
 
   </script>
 
